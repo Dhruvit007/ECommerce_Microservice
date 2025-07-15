@@ -7,7 +7,6 @@ using UserService.Application.DTOs;
 using UserService.Domain.Entities;
 using UserService.Domain.Repositories;
 
-
 namespace UserService.Application.Services
 {
     public class UserService : IUserService
@@ -48,6 +47,42 @@ namespace UserService.Application.Services
             await _userRepository.AddUserToRoleAsync(user, "Customer");
 
             return true;
+        }
+
+        public async Task<EmailConfirmationTokenResponseDTO?> SendConfirmationEmailAsync(string email)
+        {
+            EmailConfirmationTokenResponseDTO? emailConfirmationTokenResponseDTO = null;
+            var user = await _userRepository.FindByEmailAsync(email);
+            if (user == null)
+                return null;
+
+            var token = await _userRepository.GenerateEmailConfirmationTokenAsync(user);
+
+            if (token != null)
+            {
+                emailConfirmationTokenResponseDTO = new EmailConfirmationTokenResponseDTO()
+                {
+                    UserId = user.Id,
+                    Token = token
+                };
+            }
+
+            return emailConfirmationTokenResponseDTO;
+        }
+
+        public async Task<bool> VerifyConfirmationEmailAsync(ConfirmEmailDTO dto)
+        {
+            var user = await _userRepository.FindByIdAsync(dto.UserId);
+            if (user == null)
+                return false;
+
+            var result = await _userRepository.VerifyConfirmaionEmailAsync(user, dto.Token);
+            if (result)
+            {
+                user.IsActive = true;
+                await _userRepository.UpdateUserAsync(user);
+            }
+            return result;
         }
 
         public async Task<LoginResponseDTO> LoginAsync(LoginDTO dto, string ipAddress, string userAgent)
@@ -95,7 +130,7 @@ namespace UserService.Application.Services
                 return response;
             }
 
-            // Validate password
+            // Validate Password
             var passwordValid = await _userRepository.CheckPasswordAsync(user, dto.Password);
             if (!passwordValid)
             {
@@ -122,6 +157,7 @@ namespace UserService.Application.Services
             if (await _userRepository.IsTwoFactorEnabledAsync(user))
             {
                 response.RequiresTwoFactor = true;
+                //Send the OTP
                 return response;
             }
 
@@ -133,42 +169,6 @@ namespace UserService.Application.Services
             response.RefreshToken = await _userRepository.GenerateAndStoreRefreshTokenAsync(user.Id, dto.ClientId, userAgent, ipAddress);
 
             return response;
-        }
-
-        public async Task<EmailConfirmationTokenResponseDTO?> SendConfirmationEmailAsync(string email)
-        {
-            EmailConfirmationTokenResponseDTO? emailConfirmationTokenResponseDTO = null;
-            var user = await _userRepository.FindByEmailAsync(email);
-            if (user == null)
-                return null;
-
-            var token = await _userRepository.GenerateEmailConfirmationTokenAsync(user);
-
-            if (token != null)
-            {
-                emailConfirmationTokenResponseDTO = new EmailConfirmationTokenResponseDTO()
-                {
-                    UserId = user.Id,
-                    Token = token
-                };
-            }
-
-            return emailConfirmationTokenResponseDTO;
-        }
-
-        public async Task<bool> VerifyConfirmationEmailAsync(ConfirmEmailDTO dto)
-        {
-            var user = await _userRepository.FindByIdAsync(dto.UserId);
-            if (user == null)
-                return false;
-
-            var result = await _userRepository.VerifyConfirmaionEmailAsync(user, dto.Token);
-            if (result)
-            {
-                user.IsActive = true;
-                await _userRepository.UpdateUserAsync(user);
-            }
-            return result;
         }
 
         public async Task<RefreshTokenResponseDTO> RefreshTokenAsync(RefreshTokenRequestDTO dto, string ipAddress, string userAgent)
@@ -208,6 +208,7 @@ namespace UserService.Application.Services
             return response;
         }
 
+        //Logout
         public async Task<bool> RevokeRefreshTokenAsync(string token, string ipAddress)
         {
             var refreshToken = await _userRepository.GetRefreshTokenAsync(token);
@@ -240,6 +241,14 @@ namespace UserService.Application.Services
             return forgotPasswordResponseDTO;
         }
 
+        public async Task<bool> ResetPasswordAsync(Guid userId, string token, string newPassword)
+        {
+            var user = await _userRepository.FindByIdAsync(userId);
+            if (user == null) return false;
+
+            return await _userRepository.ResetPasswordAsync(user, token, newPassword);
+        }
+
         public async Task<bool> ChangePasswordAsync(Guid userId, string currentPassword, string newPassword)
         {
             var user = await _userRepository.FindByIdAsync(userId);
@@ -247,14 +256,6 @@ namespace UserService.Application.Services
                 return false;
 
             return await _userRepository.ChangePasswordAsync(user, currentPassword, newPassword);
-        }
-
-        public async Task<bool> ResetPasswordAsync(Guid userId, string token, string newPassword)
-        {
-            var user = await _userRepository.FindByIdAsync(userId);
-            if (user == null) return false;
-
-            return await _userRepository.ResetPasswordAsync(user, token, newPassword);
         }
 
         public async Task<ProfileDTO?> GetProfileAsync(Guid userId)
@@ -287,23 +288,6 @@ namespace UserService.Application.Services
             return await _userRepository.UpdateUserAsync(user);
         }
 
-        public async Task<IEnumerable<AddressDTO>> GetAddressesAsync(Guid userId)
-        {
-            var addresses = await _userRepository.GetAddressesByUserIdAsync(userId);
-            return addresses.Select(a => new AddressDTO
-            {
-                Id = a.Id,
-                AddressLine1 = a.AddressLine1,
-                AddressLine2 = a.AddressLine2,
-                City = a.City,
-                State = a.State,
-                PostalCode = a.PostalCode,
-                Country = a.Country,
-                IsDefaultBilling = a.IsDefaultBilling,
-                IsDefaultShipping = a.IsDefaultShipping
-            });
-        }
-
         public async Task<bool> AddOrUpdateAddressAsync(AddressDTO dto)
         {
             var address = new Address
@@ -323,6 +307,23 @@ namespace UserService.Application.Services
             return await _userRepository.AddOrUpdateAddressAsync(address);
         }
 
+        public async Task<IEnumerable<AddressDTO>> GetAddressesAsync(Guid userId)
+        {
+            var addresses = await _userRepository.GetAddressesByUserIdAsync(userId);
+            return addresses.Select(a => new AddressDTO
+            {
+                Id = a.Id,
+                AddressLine1 = a.AddressLine1,
+                AddressLine2 = a.AddressLine2,
+                City = a.City,
+                State = a.State,
+                PostalCode = a.PostalCode,
+                Country = a.Country,
+                IsDefaultBilling = a.IsDefaultBilling,
+                IsDefaultShipping = a.IsDefaultShipping
+            });
+        }
+
         public async Task<bool> DeleteAddressAsync(Guid userId, Guid addressId)
         {
             return await _userRepository.DeleteAddressAsync(userId, addressId);
@@ -335,7 +336,8 @@ namespace UserService.Application.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
                 new Claim(ClaimTypes.Name, user.UserName ?? ""),
-                new Claim("client_id", clientId)
+                new Claim("client_id", clientId),
+                new Claim("UserId", user.Id.ToString())
             };
 
             // Add role claims
