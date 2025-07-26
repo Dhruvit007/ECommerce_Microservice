@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OrderService.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace OrderService.Domain.Entities
@@ -27,7 +28,7 @@ namespace OrderService.Domain.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }  // Final payable amount
         public string PaymentMethod { get; set; } = null!;
-        public Guid OrderStatusId { get; set; }
+        public OrderStatusEnum OrderStatusId { get; set; }
         public OrderStatus? OrderStatus { get; set; }
 
         [Required, MaxLength(1000)]

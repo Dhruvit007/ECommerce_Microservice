@@ -19,5 +19,9 @@ namespace OrderService.Domain.Entities
         // Amount eligible for refund for this cancellation item
         [Column(TypeName = "decimal(18,2)")]
         public decimal RefundableAmount { get; set; }
+
+        // Optional per-item notes (admin/customer)
+        [MaxLength(500)]
+        public string? Remarks { get; set; }
     }
 }

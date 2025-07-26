@@ -5,7 +5,7 @@ namespace OrderService.Domain.Entities
     public class CancellationPolicy
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         //Standard Cancellation Policy, No Cancellation After Shipment
 

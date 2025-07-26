@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OrderService.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace OrderService.Domain.Entities
 {
     [Index(nameof(OrderId))]
@@ -12,14 +14,29 @@ namespace OrderService.Domain.Entities
         public Guid OrderId { get; set; }
         public Order? Order { get; set; }
 
-        public Guid CancellationStatusId { get; set; }
+        public CancellationStatusEnum CancellationStatusId { get; set; }
         public CancellationStatus? CancellationStatus { get; set; }
 
-        public Guid ReasonId { get; set; }
+        public int ReasonId { get; set; }
         public ReasonMaster? Reason { get; set; }
-
         public bool IsPartial { get; set; }
 
+        // Who processed/approved/rejected (admin or system)
+        public string? ProcessedBy { get; set; }
+        public string? ApprovedBy { get; set; }
+        public string? RejectedBy { get; set; }
+        public DateTime? ApprovedAt { get; set; }
+        public DateTime? RejectedAt { get; set; }
+        public string? ApprovalRemarks { get; set; }
+        public string? RejectionRemarks { get; set; }
+
+        // Policy snapshot (if needed)
+        public int? CancellationPolicyId { get; set; }
+        public CancellationPolicy? Policy { get; set; }
+
+        // For reporting/quick totals
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? TotalRefundableAmount { get; set; }
         public DateTime RequestedAt { get; set; }
         public DateTime? ProcessedAt { get; set; }
 

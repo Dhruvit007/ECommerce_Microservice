@@ -16,10 +16,10 @@ namespace OrderService.Domain.Entities
 
         public int ReturnedQuantity { get; set; }
 
-        // Amount eligible for refund for this returned item
-
         [Column(TypeName = "decimal(18,2)")]
         public decimal RefundableAmount { get; set; }
 
+        [MaxLength(500)]
+        public string? Remarks { get; set; }
     }
 }

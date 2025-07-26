@@ -1,33 +1,38 @@
 ﻿using OrderService.Domain.Entities;
+using OrderService.Domain.Enums;
 
 namespace OrderService.Domain.Repositories
 {
     public interface IRefundRepository
     {
+        // Get a refund request by its unique ID (Customer or Admin).
         Task<Refund?> GetByIdAsync(Guid refundId);
+
+        // Get all refunds for a specific order (Customer/My Orders).
         Task<List<Refund>> GetByOrderIdAsync(Guid orderId);
+
+        // Add a new refund request (Customer, usually system initiated).
         Task<Refund?> AddAsync(Refund refund);
 
-        // Update refund details (e.g., status, amounts, transaction references)
+        // Update an existing refund (Customer can view status, usually admin updates).
         Task<Refund?> UpdateAsync(Refund refund);
 
-        // Soft or hard delete a refund record by ID
-        Task DeleteAsync(Guid refundId);
-
-        // Get all refund items linked to a particular refund (for item-level tracking)
+        // Get all refund items linked to a refund (Admin or Customer).
         Task<List<RefundItem>> GetRefundItemsByRefundIdAsync(Guid refundId);
 
-        // Add a refund item (to track item-level refunded quantities and amounts)
-        Task<RefundItem?> AddRefundItemAsync(RefundItem refundItem);
-        Task<RefundItem?> UpdateRefundItemAsync(RefundItem refundItem);
+        // Check if a refund exists by ID.
+        Task<bool> ExistsAsync(Guid refundId);
 
-        // Delete a refund item by its ID
-        Task DeleteRefundItemAsync(Guid refundItemId);
+        // Get paginated list of all refunds (Admin, Reporting).
+        Task<List<Refund>> GetAllAsync(int pageNumber = 1, int pageSize = 20);
 
-        // Optional: Get refunds filtered by status for reporting or processing
-        Task<List<Refund>> GetByRefundStatusAsync(string refundStatus);
+        // Get refunds by status (Admin, Reporting).
+        Task<List<Refund>> GetByStatusAsync(RefundStatusEnum refundStatusId, int pageNumber = 1, int pageSize = 20);
 
-        // Optional: Get refunds within a date range for reconciliation
-        Task<List<Refund>> GetRefundsByDateRangeAsync(DateTime fromDate, DateTime toDate);
+        // Get refunds for a user (Customer).
+        Task<List<Refund>> GetByUserIdAsync(Guid userId, int pageNumber = 1, int pageSize = 20);
+
+        // Get refunds by date range (Admin, Reporting).
+        Task<List<Refund>> GetByDateRangeAsync(DateTime fromDate, DateTime toDate, int pageNumber = 1, int pageSize = 20);
     }
 }

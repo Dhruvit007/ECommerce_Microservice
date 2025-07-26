@@ -5,7 +5,7 @@ namespace OrderService.Domain.Entities
     public class OrderStatus
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         //Pending, Confirmed, Packed, Shipped, Delivered, Cancelled, Returned
         [Required, MaxLength(50)]

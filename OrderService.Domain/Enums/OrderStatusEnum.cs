@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OrderService.Domain.Enums
+﻿namespace OrderService.Domain.Enums
 {
-    public class OrderStatusEnum
+    public enum OrderStatusEnum
     {
+        Pending = 1,
+        Confirmed = 2,
+        Packed = 3,
+        Shipped = 4,
+        Delivered = 5,
+        Cancelled = 6,
+        PartialCancelled = 7,
+        Returned = 8
     }
 }

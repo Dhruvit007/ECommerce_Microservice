@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OrderService.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 namespace OrderService.Domain.Entities
 {
@@ -17,8 +18,8 @@ namespace OrderService.Domain.Entities
         [Required, MaxLength(200)]
         public string TrackingNumber { get; set; } = null!;
 
-        [Required, MaxLength(100)]
-        public string ShipmentStatus { get; set; } = null!;
+        public ShipmentStatusEnum ShipmentStatusId { get; set; }
+        public ShipmentStatus? ShipmentStatus { get; set; }
 
         public DateTime? EstimatedDeliveryDate { get; set; }
         public DateTime? DeliveredAt { get; set; }

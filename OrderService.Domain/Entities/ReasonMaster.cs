@@ -5,7 +5,7 @@ namespace OrderService.Domain.Entities
     public class ReasonMaster
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         // Cancellation, Return
         [Required, MaxLength(50)]

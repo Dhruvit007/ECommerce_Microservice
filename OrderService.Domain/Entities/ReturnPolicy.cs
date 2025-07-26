@@ -5,7 +5,7 @@ namespace OrderService.Domain.Entities
     public class ReturnPolicy
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         //Standard Return Policy, No Returns After 3 Days
         [Required, MaxLength(150)]
         public string PolicyName { get; set; } = null!;

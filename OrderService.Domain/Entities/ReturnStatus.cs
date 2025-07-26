@@ -1,14 +1,12 @@
-﻿
-using OrderService.Domain.Enums;
+﻿using OrderService.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 namespace OrderService.Domain.Entities
 {
     public class ReturnStatus
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
-        //Requested, Item Received, Inspected, Approved, Rejected, Refunded, Completed
         [Required, MaxLength(100)]
         public ReturnStatusEnum StatusName { get; set; }
 

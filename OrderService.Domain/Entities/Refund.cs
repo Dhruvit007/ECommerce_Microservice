@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OrderService.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace OrderService.Domain.Entities
@@ -41,7 +42,7 @@ namespace OrderService.Domain.Entities
 
         public DateTime RefundDate { get; set; }
 
-        public Guid RefundStatusId { get; set; }
+        public RefundStatusEnum RefundStatusId { get; set; }
         public RefundStatus? RefundStatus { get; set; }
 
         [MaxLength(200)]

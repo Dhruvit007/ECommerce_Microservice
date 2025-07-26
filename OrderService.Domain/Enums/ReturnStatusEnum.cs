@@ -2,7 +2,7 @@
 {
     public enum ReturnStatusEnum
     {
-        Requested = 1,
+        Pending = 1,
         Approved = 2,
         ItemReceived = 3,
         Inspected = 4,

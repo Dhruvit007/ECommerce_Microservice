@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace OrderService.Domain.Entities
 {
     public class OrderStatusHistory
@@ -6,15 +7,31 @@ namespace OrderService.Domain.Entities
         [Key]
         public Guid Id { get; set; }
 
+        [Required]
         public Guid OrderId { get; set; }
-        public Order? Order { get; set; }
 
-        public Guid OrderStatusId { get; set; }
-        public OrderStatus? OrderStatus { get; set; }
+        [ForeignKey(nameof(OrderId))]
+        public Order Order { get; set; } = null!;
 
-        public DateTime ChangedAt { get; set; }
+        [Required]
+        public int OldStatusId { get; set; }
 
-        [MaxLength(1000)]
+        [ForeignKey(nameof(OldStatusId))]
+        public OrderStatus? OldStatus { get; set; }
+
+        [Required]
+        public int NewStatusId { get; set; }
+
+        [ForeignKey(nameof(NewStatusId))]
+        public OrderStatus? NewStatus { get; set; }
+
+        [MaxLength(100)]
+        public string? ChangedBy { get; set; }
+
+        [MaxLength(500)]
         public string? Remarks { get; set; }
+
+        [Required]
+        public DateTime ChangedAt { get; set; }
     }
 }

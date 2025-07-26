@@ -5,7 +5,7 @@ namespace OrderService.Domain.Entities
     public class Tax
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         //CGST, SGST, Shipping Tax
 
