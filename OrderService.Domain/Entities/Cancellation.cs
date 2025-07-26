@@ -19,6 +19,8 @@ namespace OrderService.Domain.Entities
 
         public int ReasonId { get; set; }
         public ReasonMaster? Reason { get; set; }
+
+        public Guid UserId {get;set; }
         public bool IsPartial { get; set; }
 
         // Who processed/approved/rejected (admin or system)
